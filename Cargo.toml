@@ -1,3 +1,6 @@
 [workspace]
 members = ["machine"]
 resolver = "2"
+
+[workspace.dependencies]
+thiserror = "1.0.61"

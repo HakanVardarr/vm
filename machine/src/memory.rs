@@ -1,5 +1,7 @@
+use super::error::MemoryError;
+
 pub struct Memory {
-    mem: Vec<u8>,
+    mem: Vec<u16>,
 }
 
 impl Memory {
@@ -7,24 +9,21 @@ impl Memory {
         Self { mem: vec![0; n] }
     }
 
-    pub fn read(&mut self, p: usize) -> Result<u8, String> {
-        self.mem
-            .get(p)
-            .map(|v| *v)
-            .ok_or(String::from("Unable to read at that location."))
+    pub fn read(&mut self, p: usize) -> Result<u16, MemoryError> {
+        self.mem.get(p).map(|v| *v).ok_or(MemoryError::ReadError)
     }
 
-    pub fn write(&mut self, p: usize, value: u8) -> Result<(), String> {
+    pub fn write(&mut self, p: usize, value: u16) -> Result<(), MemoryError> {
         self.mem
             .get_mut(p)
             .map(|v| *v = value)
-            .ok_or(String::from("Unable to write."))
+            .ok_or(MemoryError::WriteError)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::Memory;
+    use super::{Memory, MemoryError};
 
     #[test]
     fn memory_read() {
@@ -48,13 +47,11 @@ mod test {
     #[test]
     fn memory_out_of_bounds() {
         let mut memory = Memory::new(1024 * 1024);
-        assert!(
-            memory.write(1024 * 1024, 10).is_err(),
-            "The index that given to the function is out of bounds this should return Err."
-        );
-        assert!(
-            memory.read(1024 * 1024).is_err(),
-            "The index that given to the function is out of bounds this should return Err."
-        );
+        let _ = memory
+            .write(1024 * 1024, 10)
+            .map_err(|e| assert!(e == MemoryError::WriteError));
+        let _ = memory
+            .read(1024 * 1024)
+            .map_err(|e| e == MemoryError::ReadError);
     }
 }
