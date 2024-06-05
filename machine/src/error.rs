@@ -15,3 +15,13 @@ pub enum StackError {
     #[error("Stackunderflow!")]
     StackUnderflow,
 }
+
+#[derive(Debug, Error, PartialEq)]
+pub enum MachineError {
+    #[error("{0}")]
+    MemoryError(MemoryError),
+    #[error("{0}")]
+    StackError(StackError),
+    #[error("Unknown opcode: {0}")]
+    UnknownOpCode(u16),
+}
