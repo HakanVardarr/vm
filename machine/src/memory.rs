@@ -1,5 +1,6 @@
 use super::error::MemoryError;
 
+// Memory Struct
 pub struct Memory {
     mem: Vec<u16>,
 }
